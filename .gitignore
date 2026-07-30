@@ -1,0 +1,9 @@
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.pytest_cache/
+.venv/
+.env
+.streamlit/
+outputs/
+data/*.xlsx
