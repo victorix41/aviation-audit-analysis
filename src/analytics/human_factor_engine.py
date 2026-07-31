@@ -5,6 +5,9 @@ import pandas as pd
 from src.analytics.common.text_standardiser import (
     standardise_text_series,
 )
+from src.analytics.common.trend_engine import (
+    generate_long_trend_table,
+)
 from src.analytics.pareto_engine import generate_pareto
 from src.models.human_factor_analysis import HumanFactorAnalysis
 
@@ -12,125 +15,6 @@ from src.models.human_factor_analysis import HumanFactorAnalysis
 HUMAN_FACTOR_COLUMN = "human_factor"
 DEFAULT_DATE_COLUMN = "response_due_date"
 UNSPECIFIED_LABEL = "Unspecified"
-
-
-def _empty_trend_table() -> pd.DataFrame:
-    """Return an empty trend table with the expected structure."""
-
-    return pd.DataFrame(
-        columns=[
-            "period",
-            "human_factor",
-            "frequency",
-            "period_total",
-            "percentage",
-        ]
-    )
-
-
-def _generate_trend_table(
-    dataframe: pd.DataFrame,
-    *,
-    date_column: str,
-    period_frequency: str,
-) -> pd.DataFrame:
-    """
-    Generate human-factor frequencies by period.
-
-    The returned table uses long format so that it can later be
-    consumed directly by Plotly, Streamlit and reporting modules.
-    """
-
-    working_dataframe = dataframe[
-        [
-            date_column,
-            HUMAN_FACTOR_COLUMN,
-        ]
-    ].copy()
-
-    working_dataframe[date_column] = pd.to_datetime(
-        working_dataframe[date_column],
-        errors="coerce",
-    )
-
-    working_dataframe = working_dataframe.dropna(
-        subset=[date_column]
-    )
-
-    if working_dataframe.empty:
-        return _empty_trend_table()
-
-    working_dataframe[HUMAN_FACTOR_COLUMN] = (
-        standardise_text_series(
-            working_dataframe[
-                HUMAN_FACTOR_COLUMN
-            ],
-            unspecified_label=UNSPECIFIED_LABEL,
-        )
-    )
-
-    working_dataframe["period"] = (
-        working_dataframe[date_column]
-        .dt.to_period(period_frequency)
-        .astype(str)
-    )
-
-    trend_table = (
-        working_dataframe
-        .groupby(
-            [
-                "period",
-                HUMAN_FACTOR_COLUMN,
-            ],
-            observed=True,
-        )
-        .size()
-        .reset_index(name="frequency")
-        .rename(
-            columns={
-                HUMAN_FACTOR_COLUMN: "human_factor",
-            }
-        )
-    )
-
-    trend_table["period_total"] = (
-        trend_table
-        .groupby(
-            "period",
-            observed=True,
-        )["frequency"]
-        .transform("sum")
-        .astype(int)
-    )
-
-    trend_table["percentage"] = (
-        trend_table["frequency"]
-        / trend_table["period_total"]
-        * 100
-    ).round(2)
-
-    trend_table["frequency"] = (
-        trend_table["frequency"].astype(int)
-    )
-
-    trend_table = (
-        trend_table
-        .sort_values(
-            by=[
-                "period",
-                "frequency",
-                "human_factor",
-            ],
-            ascending=[
-                True,
-                False,
-                True,
-            ],
-        )
-        .reset_index(drop=True)
-    )
-
-    return trend_table
 
 
 def _calculate_latest_period_total_change(
@@ -315,22 +199,31 @@ def generate_human_factor_analysis(
             top_row["percentage"]
         )
 
-    monthly_trend = _generate_trend_table(
+    monthly_trend = generate_long_trend_table(
         dataframe,
+        category_column=HUMAN_FACTOR_COLUMN,
+        category_output_column=HUMAN_FACTOR_COLUMN,
         date_column=date_column,
         period_frequency="M",
+        unspecified_label=UNSPECIFIED_LABEL,
     )
 
-    quarterly_trend = _generate_trend_table(
+    quarterly_trend = generate_long_trend_table(
         dataframe,
+        category_column=HUMAN_FACTOR_COLUMN,
+        category_output_column=HUMAN_FACTOR_COLUMN,
         date_column=date_column,
         period_frequency="Q",
+        unspecified_label=UNSPECIFIED_LABEL,
     )
 
-    yearly_trend = _generate_trend_table(
+    yearly_trend = generate_long_trend_table(
         dataframe,
+        category_column=HUMAN_FACTOR_COLUMN,
+        category_output_column=HUMAN_FACTOR_COLUMN,
         date_column=date_column,
         period_frequency="Y",
+        unspecified_label=UNSPECIFIED_LABEL,
     )
 
     (

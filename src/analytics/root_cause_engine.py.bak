@@ -5,10 +5,6 @@ import pandas as pd
 from src.analytics.common.text_standardiser import (
     standardise_text_series,
 )
-from src.analytics.common.trend_engine import (
-    generate_long_trend_table,
-    generate_wide_trend_table,
-)
 from src.analytics.pareto_engine import generate_pareto
 from src.models.root_cause_analysis import RootCauseAnalysis
 
@@ -16,6 +12,175 @@ from src.models.root_cause_analysis import RootCauseAnalysis
 ROOT_CAUSE_COLUMN = "root_cause"
 DEFAULT_DATE_COLUMN = "response_due_date"
 UNSPECIFIED_LABEL = "Unspecified"
+
+
+def _empty_long_trend_table() -> pd.DataFrame:
+    """Return an empty long-format trend table."""
+
+    return pd.DataFrame(
+        columns=[
+            "period",
+            "root_cause",
+            "frequency",
+            "period_total",
+            "percentage",
+        ]
+    )
+
+
+def _empty_wide_trend_table() -> pd.DataFrame:
+    """Return an empty wide-format trend table."""
+
+    return pd.DataFrame(
+        columns=[
+            "period",
+            "total",
+        ]
+    )
+
+
+def _generate_long_trend_table(
+    dataframe: pd.DataFrame,
+    *,
+    date_column: str,
+    period_frequency: str,
+) -> pd.DataFrame:
+    """Generate a long-format root-cause trend table."""
+
+    working_dataframe = dataframe[
+        [
+            date_column,
+            ROOT_CAUSE_COLUMN,
+        ]
+    ].copy()
+
+    working_dataframe[date_column] = pd.to_datetime(
+        working_dataframe[date_column],
+        errors="coerce",
+    )
+
+    working_dataframe = working_dataframe.dropna(
+        subset=[date_column]
+    )
+
+    if working_dataframe.empty:
+        return _empty_long_trend_table()
+
+    working_dataframe[ROOT_CAUSE_COLUMN] = (
+        standardise_text_series(
+            working_dataframe[
+                ROOT_CAUSE_COLUMN
+            ],
+            unspecified_label=UNSPECIFIED_LABEL,
+        )
+    )
+
+    working_dataframe["period"] = (
+        working_dataframe[date_column]
+        .dt.to_period(period_frequency)
+        .astype(str)
+    )
+
+    trend_table = (
+        working_dataframe
+        .groupby(
+            [
+                "period",
+                ROOT_CAUSE_COLUMN,
+            ],
+            observed=True,
+        )
+        .size()
+        .reset_index(name="frequency")
+        .rename(
+            columns={
+                ROOT_CAUSE_COLUMN: "root_cause",
+            }
+        )
+    )
+
+    trend_table["period_total"] = (
+        trend_table
+        .groupby(
+            "period",
+            observed=True,
+        )["frequency"]
+        .transform("sum")
+        .astype(int)
+    )
+
+    trend_table["percentage"] = (
+        trend_table["frequency"]
+        / trend_table["period_total"]
+        * 100
+    ).round(2)
+
+    trend_table["frequency"] = (
+        trend_table["frequency"].astype(int)
+    )
+
+    return (
+        trend_table
+        .sort_values(
+            by=[
+                "period",
+                "frequency",
+                "root_cause",
+            ],
+            ascending=[
+                True,
+                False,
+                True,
+            ],
+        )
+        .reset_index(drop=True)
+    )
+
+
+def _generate_wide_trend_table(
+    long_trend_table: pd.DataFrame,
+) -> pd.DataFrame:
+    """Convert a long-format trend table into wide format."""
+
+    if long_trend_table.empty:
+        return _empty_wide_trend_table()
+
+    wide_table = (
+        long_trend_table
+        .pivot_table(
+            index="period",
+            columns="root_cause",
+            values="frequency",
+            aggfunc="sum",
+            fill_value=0,
+        )
+        .reset_index()
+    )
+
+    wide_table.columns.name = None
+
+    root_cause_columns = [
+        column
+        for column in wide_table.columns
+        if column != "period"
+    ]
+
+    for column in root_cause_columns:
+        wide_table[column] = (
+            wide_table[column].astype(int)
+        )
+
+    wide_table["total"] = (
+        wide_table[root_cause_columns]
+        .sum(axis=1)
+        .astype(int)
+    )
+
+    return (
+        wide_table
+        .sort_values("period")
+        .reset_index(drop=True)
+    )
 
 
 def _calculate_latest_period_total_change(
@@ -173,51 +338,39 @@ def generate_root_cause_analysis(
             top_row["percentage"]
         )
 
-    monthly_trend = generate_long_trend_table(
+    monthly_trend = _generate_long_trend_table(
         dataframe,
-        category_column=ROOT_CAUSE_COLUMN,
-        category_output_column="root_cause",
         date_column=date_column,
         period_frequency="M",
-        unspecified_label=UNSPECIFIED_LABEL,
     )
 
-    quarterly_trend = generate_long_trend_table(
+    quarterly_trend = _generate_long_trend_table(
         dataframe,
-        category_column=ROOT_CAUSE_COLUMN,
-        category_output_column="root_cause",
         date_column=date_column,
         period_frequency="Q",
-        unspecified_label=UNSPECIFIED_LABEL,
     )
 
-    yearly_trend = generate_long_trend_table(
+    yearly_trend = _generate_long_trend_table(
         dataframe,
-        category_column=ROOT_CAUSE_COLUMN,
-        category_output_column="root_cause",
         date_column=date_column,
         period_frequency="Y",
-        unspecified_label=UNSPECIFIED_LABEL,
     )
 
     monthly_wide_trend = (
-        generate_wide_trend_table(
-            monthly_trend,
-            category_column="root_cause",
+        _generate_wide_trend_table(
+            monthly_trend
         )
     )
 
     quarterly_wide_trend = (
-        generate_wide_trend_table(
-            quarterly_trend,
-            category_column="root_cause",
+        _generate_wide_trend_table(
+            quarterly_trend
         )
     )
 
     yearly_wide_trend = (
-        generate_wide_trend_table(
-            yearly_trend,
-            category_column="root_cause",
+        _generate_wide_trend_table(
+            yearly_trend
         )
     )
 
