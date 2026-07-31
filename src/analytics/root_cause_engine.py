@@ -2,6 +2,9 @@
 
 import pandas as pd
 
+from src.analytics.common.text_standardiser import (
+    standardise_text_series,
+)
 from src.analytics.pareto_engine import generate_pareto
 from src.models.root_cause_analysis import RootCauseAnalysis
 
@@ -9,49 +12,6 @@ from src.models.root_cause_analysis import RootCauseAnalysis
 ROOT_CAUSE_COLUMN = "root_cause"
 DEFAULT_DATE_COLUMN = "response_due_date"
 UNSPECIFIED_LABEL = "Unspecified"
-
-
-def _standardise_root_cause_series(
-    series: pd.Series,
-) -> pd.Series:
-    """
-    Clean and standardise root-cause text.
-
-    Processing:
-    - converts values to pandas string format,
-    - removes leading and trailing spaces,
-    - replaces blanks and missing values,
-    - standardises whitespace,
-    - applies sentence-style capitalisation.
-    """
-
-    cleaned_series = (
-        series.astype("string")
-        .str.strip()
-        .str.replace(
-            r"\s+",
-            " ",
-            regex=True,
-        )
-    )
-
-    missing_mask = (
-        cleaned_series.isna()
-        | cleaned_series.eq("")
-    )
-
-    cleaned_series = cleaned_series.mask(
-        missing_mask,
-        UNSPECIFIED_LABEL,
-    )
-
-    cleaned_series = (
-        cleaned_series
-        .str.lower()
-        .str.capitalize()
-    )
-
-    return cleaned_series
 
 
 def _empty_long_trend_table() -> pd.DataFrame:
@@ -107,8 +67,11 @@ def _generate_long_trend_table(
         return _empty_long_trend_table()
 
     working_dataframe[ROOT_CAUSE_COLUMN] = (
-        _standardise_root_cause_series(
-            working_dataframe[ROOT_CAUSE_COLUMN]
+        standardise_text_series(
+            working_dataframe[
+                ROOT_CAUSE_COLUMN
+            ],
+            unspecified_label=UNSPECIFIED_LABEL,
         )
     )
 
@@ -314,8 +277,11 @@ def generate_root_cause_analysis(
     )
 
     root_cause_series = (
-        _standardise_root_cause_series(
-            dataframe[ROOT_CAUSE_COLUMN]
+        standardise_text_series(
+            dataframe[
+                ROOT_CAUSE_COLUMN
+            ],
+            unspecified_label=UNSPECIFIED_LABEL,
         )
     )
 

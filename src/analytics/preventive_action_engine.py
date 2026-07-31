@@ -2,6 +2,9 @@
 
 import pandas as pd
 
+from src.analytics.common.text_standardiser import (
+    standardise_text_series,
+)
 from src.analytics.pareto_engine import generate_pareto
 from src.models.preventive_action_analysis import (
     PreventiveActionAnalysis,
@@ -11,49 +14,6 @@ from src.models.preventive_action_analysis import (
 PREVENTIVE_ACTION_COLUMN = "preventive_action"
 DEFAULT_DATE_COLUMN = "response_due_date"
 UNSPECIFIED_LABEL = "Unspecified"
-
-
-def _standardise_preventive_action_series(
-    series: pd.Series,
-) -> pd.Series:
-    """
-    Clean and standardise preventive-action text.
-
-    Processing:
-    - converts values to pandas string format;
-    - removes leading and trailing spaces;
-    - reduces repeated internal whitespace;
-    - replaces blank and missing values;
-    - applies sentence-style capitalisation.
-    """
-
-    cleaned_series = (
-        series.astype("string")
-        .str.strip()
-        .str.replace(
-            r"\s+",
-            " ",
-            regex=True,
-        )
-    )
-
-    missing_mask = (
-        cleaned_series.isna()
-        | cleaned_series.eq("")
-    )
-
-    cleaned_series = cleaned_series.mask(
-        missing_mask,
-        UNSPECIFIED_LABEL,
-    )
-
-    cleaned_series = (
-        cleaned_series
-        .str.lower()
-        .str.capitalize()
-    )
-
-    return cleaned_series
 
 
 def _empty_long_trend_table() -> pd.DataFrame:
@@ -109,10 +69,11 @@ def _generate_long_trend_table(
         return _empty_long_trend_table()
 
     working_dataframe[PREVENTIVE_ACTION_COLUMN] = (
-        _standardise_preventive_action_series(
+        standardise_text_series(
             working_dataframe[
                 PREVENTIVE_ACTION_COLUMN
-            ]
+            ],
+            unspecified_label=UNSPECIFIED_LABEL,
         )
     )
 
@@ -291,8 +252,8 @@ def generate_preventive_action_analysis(
     Generate current and time-based preventive-action analytics.
 
     The current dataset uses ``response_due_date`` for time grouping.
-    This represents the preventive-action due-date workload, rather
-    than the date on which the original finding occurred.
+    This represents the preventive-action due-date workload rather
+    than the date on which the original audit finding occurred.
     """
 
     required_columns = {
@@ -320,10 +281,11 @@ def generate_preventive_action_analysis(
     )
 
     preventive_action_series = (
-        _standardise_preventive_action_series(
+        standardise_text_series(
             dataframe[
                 PREVENTIVE_ACTION_COLUMN
-            ]
+            ],
+            unspecified_label=UNSPECIFIED_LABEL,
         )
     )
 

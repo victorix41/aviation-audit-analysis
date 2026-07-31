@@ -2,6 +2,9 @@
 
 import pandas as pd
 
+from src.analytics.common.text_standardiser import (
+    standardise_text_series,
+)
 from src.analytics.pareto_engine import generate_pareto
 from src.models.human_factor_analysis import HumanFactorAnalysis
 
@@ -9,43 +12,6 @@ from src.models.human_factor_analysis import HumanFactorAnalysis
 HUMAN_FACTOR_COLUMN = "human_factor"
 DEFAULT_DATE_COLUMN = "response_due_date"
 UNSPECIFIED_LABEL = "Unspecified"
-
-
-def _standardise_human_factor_series(
-    series: pd.Series,
-) -> pd.Series:
-    """
-    Clean and standardise human-factor category values.
-
-    The function:
-    - converts values to pandas string format,
-    - removes leading and trailing spaces,
-    - replaces missing and blank values with ``Unspecified``,
-    - standardises capitalisation.
-    """
-
-    cleaned_series = (
-        series.astype("string")
-        .str.strip()
-    )
-
-    missing_mask = (
-        cleaned_series.isna()
-        | cleaned_series.eq("")
-    )
-
-    cleaned_series = cleaned_series.mask(
-        missing_mask,
-        UNSPECIFIED_LABEL,
-    )
-
-    cleaned_series = (
-        cleaned_series
-        .str.lower()
-        .str.capitalize()
-    )
-
-    return cleaned_series
 
 
 def _empty_trend_table() -> pd.DataFrame:
@@ -95,8 +61,11 @@ def _generate_trend_table(
         return _empty_trend_table()
 
     working_dataframe[HUMAN_FACTOR_COLUMN] = (
-        _standardise_human_factor_series(
-            working_dataframe[HUMAN_FACTOR_COLUMN]
+        standardise_text_series(
+            working_dataframe[
+                HUMAN_FACTOR_COLUMN
+            ],
+            unspecified_label=UNSPECIFIED_LABEL,
         )
     )
 
@@ -285,8 +254,11 @@ def generate_human_factor_analysis(
     )
 
     human_factor_series = (
-        _standardise_human_factor_series(
-            dataframe[HUMAN_FACTOR_COLUMN]
+        standardise_text_series(
+            dataframe[
+                HUMAN_FACTOR_COLUMN
+            ],
+            unspecified_label=UNSPECIFIED_LABEL,
         )
     )
 
@@ -324,9 +296,6 @@ def generate_human_factor_analysis(
         missing_label=UNSPECIFIED_LABEL,
     )
 
-    # Read top-category information directly from the Pareto table.
-    # This avoids depending on a top_frequency property that is not
-    # present in the existing ParetoResult model.
     if pareto_result.table.empty:
         top_factor = None
         top_factor_frequency = 0
@@ -387,6 +356,7 @@ def generate_human_factor_analysis(
 
     return HumanFactorAnalysis(
         date_column=date_column,
+
         total_findings=total_findings,
         specified_findings=specified_findings,
         unspecified_findings=unspecified_findings,
