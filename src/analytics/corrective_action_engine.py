@@ -2,6 +2,12 @@
 
 import pandas as pd
 
+from src.analytics.common.column_validation import (
+    validate_required_columns,
+)
+from src.analytics.common.period_comparison import (
+    calculate_latest_period_total_change,
+)
 from src.analytics.common.text_standardiser import (
     standardise_text_series,
 )
@@ -20,63 +26,6 @@ DEFAULT_DATE_COLUMN = "response_due_date"
 UNSPECIFIED_LABEL = "Unspecified"
 
 
-def _calculate_latest_period_total_change(
-    trend_table: pd.DataFrame,
-) -> tuple[int | None, float | None]:
-    """Compare totals for the latest two periods."""
-
-    if trend_table.empty:
-        return None, None
-
-    period_totals = (
-        trend_table[
-            [
-                "period",
-                "period_total",
-            ]
-        ]
-        .drop_duplicates(
-            subset=["period"]
-        )
-        .sort_values("period")
-        .reset_index(drop=True)
-    )
-
-    if len(period_totals) < 2:
-        return None, None
-
-    previous_total = int(
-        period_totals.iloc[-2]["period_total"]
-    )
-
-    latest_total = int(
-        period_totals.iloc[-1]["period_total"]
-    )
-
-    absolute_change = (
-        latest_total - previous_total
-    )
-
-    if previous_total == 0:
-        percentage_change = (
-            0.0
-            if latest_total == 0
-            else None
-        )
-    else:
-        percentage_change = round(
-            absolute_change
-            / previous_total
-            * 100,
-            2,
-        )
-
-    return (
-        absolute_change,
-        percentage_change,
-    )
-
-
 def generate_corrective_action_analysis(
     dataframe: pd.DataFrame,
     *,
@@ -90,25 +39,14 @@ def generate_corrective_action_analysis(
     true finding-occurrence trends.
     """
 
-    required_columns = {
-        CORRECTIVE_ACTION_COLUMN,
-        date_column,
-    }
-
-    missing_columns = (
-        required_columns
-        - set(dataframe.columns)
+    validate_required_columns(
+        dataframe,
+        {
+            CORRECTIVE_ACTION_COLUMN,
+            date_column,
+        },
+        "corrective-action analysis",
     )
-
-    if missing_columns:
-        missing_text = ", ".join(
-            sorted(missing_columns)
-        )
-
-        raise KeyError(
-            "Required corrective-action analysis "
-            f"column(s) missing: {missing_text}"
-        )
 
     total_findings = int(
         len(dataframe)
@@ -229,21 +167,21 @@ def generate_corrective_action_analysis(
     (
         latest_month_total_change,
         latest_month_total_change_percentage,
-    ) = _calculate_latest_period_total_change(
+    ) = calculate_latest_period_total_change(
         monthly_trend
     )
 
     (
         latest_quarter_total_change,
         latest_quarter_total_change_percentage,
-    ) = _calculate_latest_period_total_change(
+    ) = calculate_latest_period_total_change(
         quarterly_trend
     )
 
     (
         latest_year_total_change,
         latest_year_total_change_percentage,
-    ) = _calculate_latest_period_total_change(
+    ) = calculate_latest_period_total_change(
         yearly_trend
     )
 

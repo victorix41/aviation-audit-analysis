@@ -2,7 +2,15 @@ import pandas as pd
 
 from src.analytics.pareto_engine import generate_pareto
 from src.models.severity_analysis import SeverityAnalysis
+from src.analytics.common.column_validation import (
+    validate_required_columns,
+)
 
+
+
+from src.analytics.common.math_utils import (
+    calculate_percentage,
+)
 
 SEVERITY_COLUMN = "severity_level"
 DEFAULT_DATE_COLUMN = "response_due_date"
@@ -13,21 +21,6 @@ SEVERITY_CATEGORIES = [
     "Major",
     "Unspecified",
 ]
-
-
-def _calculate_percentage(
-    count: int,
-    total: int,
-) -> float:
-    """Calculate a percentage while handling an empty dataset."""
-
-    if total == 0:
-        return 0.0
-
-    return round(
-        count / total * 100,
-        2,
-    )
 
 
 def _prepare_severity_series(
@@ -196,25 +189,14 @@ def generate_severity_analysis(
     be preferred for genuine finding-occurrence trends.
     """
 
-    required_columns = {
-        SEVERITY_COLUMN,
-        date_column,
-    }
-
-    missing_columns = (
-        required_columns
-        - set(dataframe.columns)
+    validate_required_columns(
+        dataframe,
+        {
+            SEVERITY_COLUMN,
+            date_column,
+        },
+        "severity analysis",
     )
-
-    if missing_columns:
-        missing_text = ", ".join(
-            sorted(missing_columns)
-        )
-
-        raise KeyError(
-            "Required severity analysis column(s) missing: "
-            f"{missing_text}"
-        )
 
     total_findings = int(
         len(dataframe)
@@ -307,25 +289,25 @@ def generate_severity_analysis(
         unspecified_count=unspecified_count,
 
         observation_percentage=(
-            _calculate_percentage(
+            calculate_percentage(
                 observation_count,
                 total_findings,
             )
         ),
         minor_percentage=(
-            _calculate_percentage(
+            calculate_percentage(
                 minor_count,
                 total_findings,
             )
         ),
         major_percentage=(
-            _calculate_percentage(
+            calculate_percentage(
                 major_count,
                 total_findings,
             )
         ),
         unspecified_percentage=(
-            _calculate_percentage(
+            calculate_percentage(
                 unspecified_count,
                 total_findings,
             )

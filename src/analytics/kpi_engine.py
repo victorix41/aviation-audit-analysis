@@ -4,25 +4,18 @@ from typing import Final
 import pandas as pd
 
 from src.models.audit_summary import AuditSummary
+from src.analytics.common.column_validation import (
+    validate_required_columns,
+)
 
+
+
+from src.analytics.common.math_utils import (
+    calculate_percentage,
+)
 
 SEVERITY_COLUMN: Final = "severity_level"
 DUE_DATE_COLUMN: Final = "response_due_date"
-
-
-def _calculate_percentage(
-    count: int,
-    total: int,
-) -> float:
-    """Calculate a percentage safely."""
-
-    if total == 0:
-        return 0.0
-
-    return round(
-        count / total * 100,
-        2,
-    )
 
 
 def generate_audit_summary(
@@ -38,24 +31,14 @@ def generate_audit_summary(
     the current dataset has no status or closure-date field.
     """
 
-    required_columns = {
-        SEVERITY_COLUMN,
-        DUE_DATE_COLUMN,
-    }
-
-    missing_columns = required_columns - set(
-        dataframe.columns
+    validate_required_columns(
+        dataframe,
+        {
+            SEVERITY_COLUMN,
+            DUE_DATE_COLUMN,
+        },
+        "KPI",
     )
-
-    if missing_columns:
-        missing_text = ", ".join(
-            sorted(missing_columns)
-        )
-
-        raise KeyError(
-            "Required KPI column(s) missing: "
-            f"{missing_text}"
-        )
 
     effective_date = as_of_date or date.today()
     total_findings = int(len(dataframe))
@@ -154,25 +137,25 @@ def generate_audit_summary(
         ),
 
         observation_percentage=(
-            _calculate_percentage(
+            calculate_percentage(
                 observation_count,
                 total_findings,
             )
         ),
         minor_percentage=(
-            _calculate_percentage(
+            calculate_percentage(
                 minor_count,
                 total_findings,
             )
         ),
         major_percentage=(
-            _calculate_percentage(
+            calculate_percentage(
                 major_count,
                 total_findings,
             )
         ),
         unspecified_severity_percentage=(
-            _calculate_percentage(
+            calculate_percentage(
                 unspecified_severity_count,
                 total_findings,
             )
