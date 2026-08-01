@@ -2,7 +2,6 @@ from src.analytics.pareto_engine import generate_pareto
 from src.data_cleaner import clean_audit_data
 from src.data_loader import load_audit_data
 
-
 PARETO_COLUMNS = [
     "severity_level",
     "human_factor",

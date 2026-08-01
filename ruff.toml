@@ -1,0 +1,26 @@
+# Ruff configuration for aviation-audit-analysis
+
+target-version = "py311"
+line-length = 88
+
+exclude = [
+    ".git",
+    ".pytest_cache",
+    "__pycache__",
+    "outputs",
+]
+
+[lint]
+select = [
+    "E4",
+    "E7",
+    "E9",
+    "F",
+    "I",
+    "UP",
+]
+
+[lint.per-file-ignores]
+"tests/*.py" = [
+    "S101",
+]

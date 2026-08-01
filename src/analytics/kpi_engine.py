@@ -3,16 +3,13 @@ from typing import Final
 
 import pandas as pd
 
-from src.models.audit_summary import AuditSummary
 from src.analytics.common.column_validation import (
     validate_required_columns,
 )
-
-
-
 from src.analytics.common.math_utils import (
     calculate_percentage,
 )
+from src.models.audit_summary import AuditSummary
 
 SEVERITY_COLUMN: Final = "severity_level"
 DUE_DATE_COLUMN: Final = "response_due_date"

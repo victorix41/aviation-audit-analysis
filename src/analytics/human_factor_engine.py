@@ -17,7 +17,6 @@ from src.analytics.common.trend_engine import (
 from src.analytics.pareto_engine import generate_pareto
 from src.models.human_factor_analysis import HumanFactorAnalysis
 
-
 HUMAN_FACTOR_COLUMN = "human_factor"
 DEFAULT_DATE_COLUMN = "response_due_date"
 UNSPECIFIED_LABEL = "Unspecified"

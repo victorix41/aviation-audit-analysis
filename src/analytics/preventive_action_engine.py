@@ -20,7 +20,6 @@ from src.models.preventive_action_analysis import (
     PreventiveActionAnalysis,
 )
 
-
 PREVENTIVE_ACTION_COLUMN = "preventive_action"
 DEFAULT_DATE_COLUMN = "response_due_date"
 UNSPECIFIED_LABEL = "Unspecified"

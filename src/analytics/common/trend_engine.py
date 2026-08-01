@@ -7,7 +7,6 @@ from src.analytics.common.text_standardiser import (
     standardise_text_series,
 )
 
-
 VALID_PERIOD_FREQUENCIES = {
     "M",
     "Q",

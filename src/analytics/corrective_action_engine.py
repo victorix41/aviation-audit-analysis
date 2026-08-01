@@ -20,7 +20,6 @@ from src.models.corrective_action_analysis import (
     CorrectiveActionAnalysis,
 )
 
-
 CORRECTIVE_ACTION_COLUMN = "corrective_action"
 DEFAULT_DATE_COLUMN = "response_due_date"
 UNSPECIFIED_LABEL = "Unspecified"

@@ -1,16 +1,13 @@
 import pandas as pd
 
-from src.analytics.pareto_engine import generate_pareto
-from src.models.severity_analysis import SeverityAnalysis
 from src.analytics.common.column_validation import (
     validate_required_columns,
 )
-
-
-
 from src.analytics.common.math_utils import (
     calculate_percentage,
 )
+from src.analytics.pareto_engine import generate_pareto
+from src.models.severity_analysis import SeverityAnalysis
 
 SEVERITY_COLUMN = "severity_level"
 DEFAULT_DATE_COLUMN = "response_due_date"

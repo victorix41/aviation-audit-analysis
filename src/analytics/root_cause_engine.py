@@ -18,7 +18,6 @@ from src.analytics.common.trend_engine import (
 from src.analytics.pareto_engine import generate_pareto
 from src.models.root_cause_analysis import RootCauseAnalysis
 
-
 ROOT_CAUSE_COLUMN = "root_cause"
 DEFAULT_DATE_COLUMN = "response_due_date"
 UNSPECIFIED_LABEL = "Unspecified"
