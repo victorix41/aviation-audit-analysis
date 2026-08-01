@@ -15,15 +15,10 @@ def _format_change(
         return "Not available — fewer than two periods exist."
 
     percentage_text = (
-        "Not defined"
-        if percentage_change is None
-        else f"{percentage_change:.2f}%"
+        "Not defined" if percentage_change is None else f"{percentage_change:.2f}%"
     )
 
-    return (
-        f"{change:+d} findings "
-        f"({percentage_text})"
-    )
+    return f"{change:+d} findings ({percentage_text})"
 
 
 def run_human_factor_analysis() -> None:
@@ -31,9 +26,7 @@ def run_human_factor_analysis() -> None:
 
     raw_dataframe = load_audit_data()
 
-    cleaned_dataframe = clean_audit_data(
-        raw_dataframe
-    )
+    cleaned_dataframe = clean_audit_data(raw_dataframe)
 
     result = generate_human_factor_analysis(
         cleaned_dataframe,
@@ -45,10 +38,7 @@ def run_human_factor_analysis() -> None:
     print("AVIATION MRO HUMAN FACTOR ANALYSIS")
     print("=" * 80)
 
-    print(
-        f"Trend date field: "
-        f"{result.date_column}"
-    )
+    print(f"Trend date field: {result.date_column}")
 
     print(
         "\nImportant: the current trend is grouped by "
@@ -58,10 +48,7 @@ def run_human_factor_analysis() -> None:
     print("\nCurrent human-factor position")
     print("-" * 80)
 
-    print(
-        f"Total findings: "
-        f"{result.total_findings}"
-    )
+    print(f"Total findings: {result.total_findings}")
 
     print(
         f"Specified human factors: "
@@ -75,28 +62,16 @@ def run_human_factor_analysis() -> None:
         f"({result.unspecified_percentage:.2f}%)"
     )
 
-    print(
-        f"Unique specified human factors: "
-        f"{result.unique_human_factors}"
-    )
+    print(f"Unique specified human factors: {result.unique_human_factors}")
 
     print("\nLeading human factor")
     print("-" * 80)
 
-    print(
-        f"Top factor: "
-        f"{result.top_factor}"
-    )
+    print(f"Top factor: {result.top_factor}")
 
-    print(
-        f"Frequency: "
-        f"{result.top_factor_frequency}"
-    )
+    print(f"Frequency: {result.top_factor_frequency}")
 
-    print(
-        f"Percentage of all findings: "
-        f"{result.top_factor_percentage:.2f}%"
-    )
+    print(f"Percentage of all findings: {result.top_factor_percentage:.2f}%")
 
     print("\nHuman-factor Pareto")
     print("-" * 80)
@@ -104,11 +79,7 @@ def run_human_factor_analysis() -> None:
     if result.pareto.table.empty:
         print("No human-factor data is available.")
     else:
-        print(
-            result.pareto.table.to_string(
-                index=False
-            )
-        )
+        print(result.pareto.table.to_string(index=False))
 
     print("\nMonthly response-due-date trend")
     print("-" * 80)
@@ -116,11 +87,7 @@ def run_human_factor_analysis() -> None:
     if result.monthly_trend.empty:
         print("No monthly trend data is available.")
     else:
-        print(
-            result.monthly_trend.to_string(
-                index=False
-            )
-        )
+        print(result.monthly_trend.to_string(index=False))
 
     print("\nQuarterly response-due-date trend")
     print("-" * 80)
@@ -128,11 +95,7 @@ def run_human_factor_analysis() -> None:
     if result.quarterly_trend.empty:
         print("No quarterly trend data is available.")
     else:
-        print(
-            result.quarterly_trend.to_string(
-                index=False
-            )
-        )
+        print(result.quarterly_trend.to_string(index=False))
 
     print("\nYearly response-due-date trend")
     print("-" * 80)
@@ -140,11 +103,7 @@ def run_human_factor_analysis() -> None:
     if result.yearly_trend.empty:
         print("No yearly trend data is available.")
     else:
-        print(
-            result.yearly_trend.to_string(
-                index=False
-            )
-        )
+        print(result.yearly_trend.to_string(index=False))
 
     print("\nLatest period comparisons")
     print("-" * 80)

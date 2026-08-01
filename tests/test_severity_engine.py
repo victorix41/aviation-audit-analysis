@@ -36,9 +36,7 @@ def create_severity_test_data() -> pd.DataFrame:
 def test_current_severity_counts() -> None:
     dataframe = create_severity_test_data()
 
-    result = generate_severity_analysis(
-        dataframe
-    )
+    result = generate_severity_analysis(dataframe)
 
     assert result.total_findings == 6
     assert result.observation_count == 1
@@ -51,9 +49,7 @@ def test_current_severity_counts() -> None:
 def test_current_severity_percentages() -> None:
     dataframe = create_severity_test_data()
 
-    result = generate_severity_analysis(
-        dataframe
-    )
+    result = generate_severity_analysis(dataframe)
 
     assert result.observation_percentage == 16.67
     assert result.minor_percentage == 33.33
@@ -64,9 +60,7 @@ def test_current_severity_percentages() -> None:
 def test_severity_pareto_result() -> None:
     dataframe = create_severity_test_data()
 
-    result = generate_severity_analysis(
-        dataframe
-    )
+    result = generate_severity_analysis(dataframe)
 
     assert result.pareto.total_records == 6
     assert result.pareto.frequencies == [
@@ -76,9 +70,7 @@ def test_severity_pareto_result() -> None:
         1,
     ]
 
-    assert set(
-        result.pareto.categories
-    ) == {
+    assert set(result.pareto.categories) == {
         "Minor",
         "Major",
         "Observation",
@@ -89,29 +81,21 @@ def test_severity_pareto_result() -> None:
 def test_monthly_trend() -> None:
     dataframe = create_severity_test_data()
 
-    result = generate_severity_analysis(
-        dataframe
-    )
+    result = generate_severity_analysis(dataframe)
 
-    assert result.monthly_trend[
-        "period"
-    ].tolist() == [
+    assert result.monthly_trend["period"].tolist() == [
         "2026-01",
         "2026-02",
         "2026-03",
     ]
 
-    assert result.monthly_trend[
-        "total"
-    ].tolist() == [
+    assert result.monthly_trend["total"].tolist() == [
         2,
         3,
         1,
     ]
 
-    assert result.monthly_trend[
-        "Major"
-    ].tolist() == [
+    assert result.monthly_trend["Major"].tolist() == [
         0,
         2,
         0,
@@ -121,53 +105,29 @@ def test_monthly_trend() -> None:
 def test_quarterly_and_yearly_trends() -> None:
     dataframe = create_severity_test_data()
 
-    result = generate_severity_analysis(
-        dataframe
-    )
+    result = generate_severity_analysis(dataframe)
 
-    assert len(
-        result.quarterly_trend
-    ) == 1
+    assert len(result.quarterly_trend) == 1
 
-    assert int(
-        result.quarterly_trend.iloc[0]["total"]
-    ) == 6
+    assert int(result.quarterly_trend.iloc[0]["total"]) == 6
 
-    assert len(
-        result.yearly_trend
-    ) == 1
+    assert len(result.yearly_trend) == 1
 
-    assert int(
-        result.yearly_trend.iloc[0]["total"]
-    ) == 6
+    assert int(result.yearly_trend.iloc[0]["total"]) == 6
 
 
 def test_latest_month_change() -> None:
     dataframe = create_severity_test_data()
 
-    result = generate_severity_analysis(
-        dataframe
-    )
+    result = generate_severity_analysis(dataframe)
 
-    assert (
-        result.latest_month_total_change
-        == -2
-    )
+    assert result.latest_month_total_change == -2
 
-    assert (
-        result.latest_month_total_change_percentage
-        == -66.67
-    )
+    assert result.latest_month_total_change_percentage == -66.67
 
-    assert (
-        result.latest_month_major_change
-        == -2
-    )
+    assert result.latest_month_major_change == -2
 
-    assert (
-        result.latest_month_major_change_percentage
-        == -100.0
-    )
+    assert result.latest_month_major_change_percentage == -100.0
 
 
 def test_single_period_has_no_comparison() -> None:
@@ -186,19 +146,11 @@ def test_single_period_has_no_comparison() -> None:
         }
     )
 
-    result = generate_severity_analysis(
-        dataframe
-    )
+    result = generate_severity_analysis(dataframe)
 
-    assert (
-        result.latest_month_total_change
-        is None
-    )
+    assert result.latest_month_total_change is None
 
-    assert (
-        result.latest_month_total_change_percentage
-        is None
-    )
+    assert result.latest_month_total_change_percentage is None
 
     assert result.has_monthly_comparison is False
 
@@ -216,6 +168,4 @@ def test_missing_required_column_raises_error() -> None:
         KeyError,
         match="response_due_date",
     ):
-        generate_severity_analysis(
-            dataframe
-        )
+        generate_severity_analysis(dataframe)

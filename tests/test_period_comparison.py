@@ -22,9 +22,7 @@ def test_calculates_positive_change() -> None:
         }
     )
 
-    result = calculate_latest_period_total_change(
-        trend_table
-    )
+    result = calculate_latest_period_total_change(trend_table)
 
     assert result == (
         5,
@@ -46,9 +44,7 @@ def test_calculates_negative_change() -> None:
         }
     )
 
-    result = calculate_latest_period_total_change(
-        trend_table
-    )
+    result = calculate_latest_period_total_change(trend_table)
 
     assert result == (
         -15,
@@ -72,9 +68,7 @@ def test_uses_latest_two_sorted_periods() -> None:
         }
     )
 
-    result = calculate_latest_period_total_change(
-        trend_table
-    )
+    result = calculate_latest_period_total_change(trend_table)
 
     assert result == (
         2,
@@ -100,9 +94,7 @@ def test_duplicate_period_rows_are_counted_once() -> None:
         }
     )
 
-    result = calculate_latest_period_total_change(
-        trend_table
-    )
+    result = calculate_latest_period_total_change(trend_table)
 
     assert result == (
         5,
@@ -122,9 +114,7 @@ def test_single_period_returns_none_values() -> None:
         }
     )
 
-    result = calculate_latest_period_total_change(
-        trend_table
-    )
+    result = calculate_latest_period_total_change(trend_table)
 
     assert result == (
         None,
@@ -140,9 +130,7 @@ def test_empty_table_returns_none_values() -> None:
         ]
     )
 
-    result = calculate_latest_period_total_change(
-        trend_table
-    )
+    result = calculate_latest_period_total_change(trend_table)
 
     assert result == (
         None,
@@ -164,9 +152,7 @@ def test_zero_previous_total_and_zero_latest_total() -> None:
         }
     )
 
-    result = calculate_latest_period_total_change(
-        trend_table
-    )
+    result = calculate_latest_period_total_change(trend_table)
 
     assert result == (
         0,
@@ -188,9 +174,7 @@ def test_zero_previous_total_and_positive_latest_total() -> None:
         }
     )
 
-    result = calculate_latest_period_total_change(
-        trend_table
-    )
+    result = calculate_latest_period_total_change(trend_table)
 
     assert result == (
         5,
@@ -211,9 +195,7 @@ def test_missing_required_column_raises_error() -> None:
         KeyError,
         match="period_total",
     ):
-        calculate_latest_period_total_change(
-            trend_table
-        )
+        calculate_latest_period_total_change(trend_table)
 
 
 def test_non_dataframe_input_raises_error() -> None:
@@ -221,6 +203,4 @@ def test_non_dataframe_input_raises_error() -> None:
         TypeError,
         match="pandas DataFrame",
     ):
-        calculate_latest_period_total_change(
-            []
-        )
+        calculate_latest_period_total_change([])

@@ -31,32 +31,17 @@ def validate_required_columns(
     """
 
     if not isinstance(dataframe, pd.DataFrame):
-        raise TypeError(
-            "dataframe must be a pandas DataFrame."
-        )
+        raise TypeError("dataframe must be a pandas DataFrame.")
 
     cleaned_context = str(context).strip()
 
     if not cleaned_context:
-        raise ValueError(
-            "context must not be empty."
-        )
+        raise ValueError("context must not be empty.")
 
     required_column_set = set(required_columns)
-    missing_columns = (
-        required_column_set
-        - set(dataframe.columns)
-    )
+    missing_columns = required_column_set - set(dataframe.columns)
 
     if missing_columns:
-        missing_text = ", ".join(
-            sorted(
-                str(column)
-                for column in missing_columns
-            )
-        )
+        missing_text = ", ".join(sorted(str(column) for column in missing_columns))
 
-        raise KeyError(
-            f"Required {cleaned_context} column(s) missing: "
-            f"{missing_text}"
-        )
+        raise KeyError(f"Required {cleaned_context} column(s) missing: {missing_text}")

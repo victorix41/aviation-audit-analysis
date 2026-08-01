@@ -10,9 +10,7 @@ def run_severity_analysis() -> None:
 
     raw_dataframe = load_audit_data()
 
-    cleaned_dataframe = clean_audit_data(
-        raw_dataframe
-    )
+    cleaned_dataframe = clean_audit_data(raw_dataframe)
 
     result = generate_severity_analysis(
         cleaned_dataframe,
@@ -24,10 +22,7 @@ def run_severity_analysis() -> None:
     print("AVIATION MRO SEVERITY ANALYSIS")
     print("=" * 70)
 
-    print(
-        f"Trend date field: "
-        f"{result.date_column}"
-    )
+    print(f"Trend date field: {result.date_column}")
 
     print(
         "\nImportant: the current trend is grouped by "
@@ -43,17 +38,9 @@ def run_severity_analysis() -> None:
         f"({result.observation_percentage:.2f}%)"
     )
 
-    print(
-        "Minor: "
-        f"{result.minor_count} "
-        f"({result.minor_percentage:.2f}%)"
-    )
+    print(f"Minor: {result.minor_count} ({result.minor_percentage:.2f}%)")
 
-    print(
-        "Major: "
-        f"{result.major_count} "
-        f"({result.major_percentage:.2f}%)"
-    )
+    print(f"Major: {result.major_count} ({result.major_percentage:.2f}%)")
 
     print(
         "Unspecified: "
@@ -64,56 +51,34 @@ def run_severity_analysis() -> None:
     print("\nSeverity Pareto")
     print("-" * 70)
 
-    print(
-        result.pareto.table.to_string(
-            index=False
-        )
-    )
+    print(result.pareto.table.to_string(index=False))
 
     print("\nMonthly response-due-date trend")
     print("-" * 70)
 
-    print(
-        result.monthly_trend.to_string(
-            index=False
-        )
-    )
+    print(result.monthly_trend.to_string(index=False))
 
     print("\nQuarterly response-due-date trend")
     print("-" * 70)
 
-    print(
-        result.quarterly_trend.to_string(
-            index=False
-        )
-    )
+    print(result.quarterly_trend.to_string(index=False))
 
     print("\nYearly response-due-date trend")
     print("-" * 70)
 
-    print(
-        result.yearly_trend.to_string(
-            index=False
-        )
-    )
+    print(result.yearly_trend.to_string(index=False))
 
     print("\nLatest monthly comparison")
     print("-" * 70)
 
-    print(
-        "Total finding change: "
-        f"{result.latest_month_total_change}"
-    )
+    print(f"Total finding change: {result.latest_month_total_change}")
 
     print(
         "Total finding percentage change: "
         f"{result.latest_month_total_change_percentage}"
     )
 
-    print(
-        "Major finding change: "
-        f"{result.latest_month_major_change}"
-    )
+    print(f"Major finding change: {result.latest_month_major_change}")
 
     print(
         "Major finding percentage change: "

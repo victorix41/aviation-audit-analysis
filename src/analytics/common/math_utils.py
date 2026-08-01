@@ -14,9 +14,7 @@ def calculate_percentage(
     """
 
     if decimal_places < 0:
-        raise ValueError(
-            "decimal_places must be zero or greater."
-        )
+        raise ValueError("decimal_places must be zero or greater.")
 
     if total == 0:
         return 0.0

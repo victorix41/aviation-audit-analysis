@@ -47,47 +47,26 @@ def generate_preventive_action_analysis(
         "preventive-action analysis",
     )
 
-    total_findings = int(
-        len(dataframe)
+    total_findings = int(len(dataframe))
+
+    preventive_action_series = standardise_text_series(
+        dataframe[PREVENTIVE_ACTION_COLUMN],
+        unspecified_label=UNSPECIFIED_LABEL,
     )
 
-    preventive_action_series = (
-        standardise_text_series(
-            dataframe[
-                PREVENTIVE_ACTION_COLUMN
-            ],
-            unspecified_label=UNSPECIFIED_LABEL,
-        )
-    )
+    unspecified_findings = int(preventive_action_series.eq(UNSPECIFIED_LABEL).sum())
 
-    unspecified_findings = int(
-        preventive_action_series
-        .eq(UNSPECIFIED_LABEL)
-        .sum()
-    )
+    specified_findings = total_findings - unspecified_findings
 
-    specified_findings = (
-        total_findings
-        - unspecified_findings
-    )
+    specified_series = preventive_action_series[
+        preventive_action_series.ne(UNSPECIFIED_LABEL)
+    ]
 
-    specified_series = (
-        preventive_action_series[
-            preventive_action_series.ne(
-                UNSPECIFIED_LABEL
-            )
-        ]
-    )
-
-    unique_preventive_actions = int(
-        specified_series.nunique()
-    )
+    unique_preventive_actions = int(specified_series.nunique())
 
     pareto_dataframe = dataframe.copy()
 
-    pareto_dataframe[
-        PREVENTIVE_ACTION_COLUMN
-    ] = preventive_action_series
+    pareto_dataframe[PREVENTIVE_ACTION_COLUMN] = preventive_action_series
 
     pareto_result = generate_pareto(
         pareto_dataframe,
@@ -103,17 +82,11 @@ def generate_preventive_action_analysis(
     else:
         top_row = pareto_result.table.iloc[0]
 
-        top_preventive_action = str(
-            top_row["category"]
-        )
+        top_preventive_action = str(top_row["category"])
 
-        top_preventive_action_frequency = int(
-            top_row["frequency"]
-        )
+        top_preventive_action_frequency = int(top_row["frequency"])
 
-        top_preventive_action_percentage = float(
-            top_row["percentage"]
-        )
+        top_preventive_action_percentage = float(top_row["percentage"])
 
     monthly_trend = generate_long_trend_table(
         dataframe,
@@ -142,96 +115,56 @@ def generate_preventive_action_analysis(
         unspecified_label=UNSPECIFIED_LABEL,
     )
 
-    monthly_wide_trend = (
-        generate_wide_trend_table(
-            monthly_trend,
-            category_column="preventive_action",
-        )
+    monthly_wide_trend = generate_wide_trend_table(
+        monthly_trend,
+        category_column="preventive_action",
     )
 
-    quarterly_wide_trend = (
-        generate_wide_trend_table(
-            quarterly_trend,
-            category_column="preventive_action",
-        )
+    quarterly_wide_trend = generate_wide_trend_table(
+        quarterly_trend,
+        category_column="preventive_action",
     )
 
-    yearly_wide_trend = (
-        generate_wide_trend_table(
-            yearly_trend,
-            category_column="preventive_action",
-        )
+    yearly_wide_trend = generate_wide_trend_table(
+        yearly_trend,
+        category_column="preventive_action",
     )
 
     (
         latest_month_total_change,
         latest_month_total_change_percentage,
-    ) = calculate_latest_period_total_change(
-        monthly_trend
-    )
+    ) = calculate_latest_period_total_change(monthly_trend)
 
     (
         latest_quarter_total_change,
         latest_quarter_total_change_percentage,
-    ) = calculate_latest_period_total_change(
-        quarterly_trend
-    )
+    ) = calculate_latest_period_total_change(quarterly_trend)
 
     (
         latest_year_total_change,
         latest_year_total_change_percentage,
-    ) = calculate_latest_period_total_change(
-        yearly_trend
-    )
+    ) = calculate_latest_period_total_change(yearly_trend)
 
     return PreventiveActionAnalysis(
         date_column=date_column,
-
         total_findings=total_findings,
         specified_findings=specified_findings,
         unspecified_findings=unspecified_findings,
-        unique_preventive_actions=(
-            unique_preventive_actions
-        ),
-
-        top_preventive_action=(
-            top_preventive_action
-        ),
-        top_preventive_action_frequency=(
-            top_preventive_action_frequency
-        ),
-        top_preventive_action_percentage=(
-            top_preventive_action_percentage
-        ),
-
+        unique_preventive_actions=(unique_preventive_actions),
+        top_preventive_action=(top_preventive_action),
+        top_preventive_action_frequency=(top_preventive_action_frequency),
+        top_preventive_action_percentage=(top_preventive_action_percentage),
         pareto=pareto_result,
-
         monthly_trend=monthly_trend,
         quarterly_trend=quarterly_trend,
         yearly_trend=yearly_trend,
-
         monthly_wide_trend=monthly_wide_trend,
         quarterly_wide_trend=quarterly_wide_trend,
         yearly_wide_trend=yearly_wide_trend,
-
-        latest_month_total_change=(
-            latest_month_total_change
-        ),
-        latest_month_total_change_percentage=(
-            latest_month_total_change_percentage
-        ),
-
-        latest_quarter_total_change=(
-            latest_quarter_total_change
-        ),
-        latest_quarter_total_change_percentage=(
-            latest_quarter_total_change_percentage
-        ),
-
-        latest_year_total_change=(
-            latest_year_total_change
-        ),
-        latest_year_total_change_percentage=(
-            latest_year_total_change_percentage
-        ),
+        latest_month_total_change=(latest_month_total_change),
+        latest_month_total_change_percentage=(latest_month_total_change_percentage),
+        latest_quarter_total_change=(latest_quarter_total_change),
+        latest_quarter_total_change_percentage=(latest_quarter_total_change_percentage),
+        latest_year_total_change=(latest_year_total_change),
+        latest_year_total_change_percentage=(latest_year_total_change_percentage),
     )

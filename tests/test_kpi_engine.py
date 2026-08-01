@@ -61,10 +61,7 @@ def test_summary_percentages() -> None:
     assert summary.minor_percentage == 40.0
     assert summary.major_percentage == 20.0
 
-    assert (
-        summary.unspecified_severity_percentage
-        == 20.0
-    )
+    assert summary.unspecified_severity_percentage == 20.0
 
 
 def test_due_date_kpis() -> None:
@@ -105,12 +102,8 @@ def test_due_date_range() -> None:
 def test_empty_dataframe_returns_zero_kpis() -> None:
     dataframe = pd.DataFrame(
         {
-            "severity_level": pd.Series(
-                dtype="string"
-            ),
-            "response_due_date": pd.Series(
-                dtype="datetime64[ns]"
-            ),
+            "severity_level": pd.Series(dtype="string"),
+            "response_due_date": pd.Series(dtype="datetime64[ns]"),
         }
     )
 

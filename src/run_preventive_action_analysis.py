@@ -17,15 +17,10 @@ def _format_change(
         return "Not available — fewer than two periods exist."
 
     percentage_text = (
-        "Not defined"
-        if percentage_change is None
-        else f"{percentage_change:.2f}%"
+        "Not defined" if percentage_change is None else f"{percentage_change:.2f}%"
     )
 
-    return (
-        f"{change:+d} findings "
-        f"({percentage_text})"
-    )
+    return f"{change:+d} findings ({percentage_text})"
 
 
 def run_preventive_action_analysis() -> None:
@@ -33,9 +28,7 @@ def run_preventive_action_analysis() -> None:
 
     raw_dataframe = load_audit_data()
 
-    cleaned_dataframe = clean_audit_data(
-        raw_dataframe
-    )
+    cleaned_dataframe = clean_audit_data(raw_dataframe)
 
     result = generate_preventive_action_analysis(
         cleaned_dataframe,
@@ -47,10 +40,7 @@ def run_preventive_action_analysis() -> None:
     print("AVIATION MRO PREVENTIVE ACTION ANALYSIS")
     print("=" * 100)
 
-    print(
-        f"Trend date field: "
-        f"{result.date_column}"
-    )
+    print(f"Trend date field: {result.date_column}")
 
     print(
         "\nImportant: the current trend is grouped by "
@@ -60,10 +50,7 @@ def run_preventive_action_analysis() -> None:
     print("\nCurrent preventive-action position")
     print("-" * 100)
 
-    print(
-        f"Total findings: "
-        f"{result.total_findings}"
-    )
+    print(f"Total findings: {result.total_findings}")
 
     print(
         f"Specified preventive actions: "
@@ -77,28 +64,16 @@ def run_preventive_action_analysis() -> None:
         f"({result.unspecified_percentage:.2f}%)"
     )
 
-    print(
-        f"Unique specified preventive actions: "
-        f"{result.unique_preventive_actions}"
-    )
+    print(f"Unique specified preventive actions: {result.unique_preventive_actions}")
 
     print("\nLeading preventive action")
     print("-" * 100)
 
-    print(
-        f"Top preventive action: "
-        f"{result.top_preventive_action}"
-    )
+    print(f"Top preventive action: {result.top_preventive_action}")
 
-    print(
-        f"Frequency: "
-        f"{result.top_preventive_action_frequency}"
-    )
+    print(f"Frequency: {result.top_preventive_action_frequency}")
 
-    print(
-        f"Percentage of all findings: "
-        f"{result.top_preventive_action_percentage:.2f}%"
-    )
+    print(f"Percentage of all findings: {result.top_preventive_action_percentage:.2f}%")
 
     print("\nPreventive-action Pareto")
     print("-" * 100)
@@ -106,11 +81,7 @@ def run_preventive_action_analysis() -> None:
     if result.pareto.table.empty:
         print("No preventive-action data is available.")
     else:
-        print(
-            result.pareto.table.to_string(
-                index=False
-            )
-        )
+        print(result.pareto.table.to_string(index=False))
 
     print("\nMonthly preventive-action trend — long format")
     print("-" * 100)
@@ -118,11 +89,7 @@ def run_preventive_action_analysis() -> None:
     if result.monthly_trend.empty:
         print("No monthly trend data is available.")
     else:
-        print(
-            result.monthly_trend.to_string(
-                index=False
-            )
-        )
+        print(result.monthly_trend.to_string(index=False))
 
     print("\nMonthly preventive-action trend — wide format")
     print("-" * 100)
@@ -130,11 +97,7 @@ def run_preventive_action_analysis() -> None:
     if result.monthly_wide_trend.empty:
         print("No monthly trend data is available.")
     else:
-        print(
-            result.monthly_wide_trend.to_string(
-                index=False
-            )
-        )
+        print(result.monthly_wide_trend.to_string(index=False))
 
     print("\nQuarterly preventive-action trend")
     print("-" * 100)
@@ -142,11 +105,7 @@ def run_preventive_action_analysis() -> None:
     if result.quarterly_trend.empty:
         print("No quarterly trend data is available.")
     else:
-        print(
-            result.quarterly_trend.to_string(
-                index=False
-            )
-        )
+        print(result.quarterly_trend.to_string(index=False))
 
     print("\nYearly preventive-action trend")
     print("-" * 100)
@@ -154,11 +113,7 @@ def run_preventive_action_analysis() -> None:
     if result.yearly_trend.empty:
         print("No yearly trend data is available.")
     else:
-        print(
-            result.yearly_trend.to_string(
-                index=False
-            )
-        )
+        print(result.yearly_trend.to_string(index=False))
 
     print("\nLatest period comparisons")
     print("-" * 100)

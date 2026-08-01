@@ -49,9 +49,7 @@ class CorrectiveActionAnalysis:
             return 0.0
 
         return round(
-            self.specified_findings
-            / self.total_findings
-            * 100,
+            self.specified_findings / self.total_findings * 100,
             2,
         )
 
@@ -63,9 +61,7 @@ class CorrectiveActionAnalysis:
             return 0.0
 
         return round(
-            self.unspecified_findings
-            / self.total_findings
-            * 100,
+            self.unspecified_findings / self.total_findings * 100,
             2,
         )
 

@@ -25,19 +25,13 @@ def run_pareto_analysis() -> None:
 
         print("\n")
         print("=" * 70)
-        print(
-            f"Pareto analysis: "
-            f"{column_name.replace('_', ' ').title()}"
-        )
+        print(f"Pareto analysis: {column_name.replace('_', ' ').title()}")
         print("=" * 70)
 
         print(result.table.to_string(index=False))
 
         print(f"\nTop category: {result.top_category}")
-        print(
-            "Top category frequency: "
-            f"{result.top_category_frequency}"
-        )
+        print(f"Top category frequency: {result.top_category_frequency}")
 
 
 if __name__ == "__main__":

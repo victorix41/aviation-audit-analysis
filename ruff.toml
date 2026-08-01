@@ -24,3 +24,10 @@ select = [
 "tests/*.py" = [
     "S101",
 ]
+
+[format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "auto"
+skip-magic-trailing-comma = false
+docstring-code-format = false

@@ -18,18 +18,12 @@ def generate_pareto(
     """
 
     if column_name not in dataframe.columns:
-        raise KeyError(
-            f"Column '{column_name}' does not exist in the dataset."
-        )
+        raise KeyError(f"Column '{column_name}' does not exist in the dataset.")
 
     series = dataframe[column_name].copy()
 
     if pd.api.types.is_string_dtype(series) or series.dtype == object:
-        series = (
-            series.astype("string")
-            .str.strip()
-            .replace("", pd.NA)
-        )
+        series = series.astype("string").str.strip().replace("", pd.NA)
 
     if include_missing:
         series = series.fillna(missing_label)
@@ -60,28 +54,18 @@ def generate_pareto(
         .reset_index(name="frequency")
     )
 
-    frequency_table["category"] = (
-        frequency_table["category"].astype(str)
-    )
+    frequency_table["category"] = frequency_table["category"].astype(str)
 
     frequency_table["percentage"] = (
-        frequency_table["frequency"]
-        .div(total_records)
-        .mul(100)
+        frequency_table["frequency"].div(total_records).mul(100)
     )
+
+    frequency_table["cumulative_percentage"] = frequency_table["percentage"].cumsum()
+
+    frequency_table["percentage"] = frequency_table["percentage"].round(2)
 
     frequency_table["cumulative_percentage"] = (
-        frequency_table["percentage"].cumsum()
-    )
-
-    frequency_table["percentage"] = (
-        frequency_table["percentage"].round(2)
-    )
-
-    frequency_table["cumulative_percentage"] = (
-        frequency_table["cumulative_percentage"]
-        .round(2)
-        .clip(upper=100.0)
+        frequency_table["cumulative_percentage"].round(2).clip(upper=100.0)
     )
 
     return ParetoResult(

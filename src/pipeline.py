@@ -42,9 +42,7 @@ def display_validation_results(
     if results.get("invalid_severity_records"):
         print("\nInvalid severity records:")
 
-        for record in results[
-            "invalid_severity_records"
-        ]:
+        for record in results["invalid_severity_records"]:
             print(record)
 
 
@@ -54,33 +52,19 @@ def run_pipeline() -> None:
     print("Loading audit register...")
     raw_dataframe = load_audit_data()
 
-    print(
-        f"Successfully loaded "
-        f"{len(raw_dataframe)} records."
-    )
+    print(f"Successfully loaded {len(raw_dataframe)} records.")
 
     print("Cleaning audit register...")
-    cleaned_dataframe = clean_audit_data(
-        raw_dataframe
-    )
+    cleaned_dataframe = clean_audit_data(raw_dataframe)
 
     print("Validating cleaned audit register...")
-    validation_results = validate_audit_data(
-        cleaned_dataframe
-    )
+    validation_results = validate_audit_data(cleaned_dataframe)
 
-    display_validation_results(
-        validation_results
-    )
+    display_validation_results(validation_results)
 
-    save_cleaned_data(
-        cleaned_dataframe
-    )
+    save_cleaned_data(cleaned_dataframe)
 
-    print(
-        "\nCleaned data saved successfully:"
-        f"\n{CLEANED_OUTPUT_FILE}"
-    )
+    print(f"\nCleaned data saved successfully:\n{CLEANED_OUTPUT_FILE}")
 
 
 if __name__ == "__main__":

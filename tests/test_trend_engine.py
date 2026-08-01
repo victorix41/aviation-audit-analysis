@@ -39,9 +39,7 @@ def create_test_dataframe() -> pd.DataFrame:
 
 
 def test_create_empty_long_trend_table() -> None:
-    result = create_empty_long_trend_table(
-        "human_factor"
-    )
+    result = create_empty_long_trend_table("human_factor")
 
     assert result.empty
 
@@ -76,31 +74,18 @@ def test_generate_monthly_long_trend_table() -> None:
         period_frequency="M",
     )
 
-    assert (
-        result["period"]
-        .unique()
-        .tolist()
-        == [
-            "2025-12",
-            "2026-01",
-            "2026-02",
-            "2026-03",
-        ]
-    )
+    assert result["period"].unique().tolist() == [
+        "2025-12",
+        "2026-01",
+        "2026-02",
+        "2026-03",
+    ]
 
     assert result["frequency"].sum() == 6
 
-    january_rows = result[
-        result["period"]
-        == "2026-01"
-    ]
+    january_rows = result[result["period"] == "2026-01"]
 
-    assert (
-        january_rows["period_total"]
-        .unique()
-        .tolist()
-        == [2]
-    )
+    assert january_rows["period_total"].unique().tolist() == [2]
 
 
 def test_generate_long_trend_standardises_categories() -> None:
@@ -114,17 +99,12 @@ def test_generate_long_trend_standardises_categories() -> None:
         period_frequency="M",
     )
 
-    categories = set(
-        result["human_factor"]
-    )
+    categories = set(result["human_factor"])
 
     assert "Knowledge gap" in categories
     assert "Unspecified" in categories
 
-    assert (
-        " knowledge   gap "
-        not in categories
-    )
+    assert " knowledge   gap " not in categories
 
 
 def test_generate_quarterly_long_trend_table() -> None:
@@ -138,27 +118,14 @@ def test_generate_quarterly_long_trend_table() -> None:
         period_frequency="Q",
     )
 
-    assert (
-        result["period"]
-        .unique()
-        .tolist()
-        == [
-            "2025Q4",
-            "2026Q1",
-        ]
-    )
-
-    q1_rows = result[
-        result["period"]
-        == "2026Q1"
+    assert result["period"].unique().tolist() == [
+        "2025Q4",
+        "2026Q1",
     ]
 
-    assert (
-        q1_rows["period_total"]
-        .unique()
-        .tolist()
-        == [5]
-    )
+    q1_rows = result[result["period"] == "2026Q1"]
+
+    assert q1_rows["period_total"].unique().tolist() == [5]
 
 
 def test_generate_yearly_long_trend_table() -> None:
@@ -172,27 +139,14 @@ def test_generate_yearly_long_trend_table() -> None:
         period_frequency="Y",
     )
 
-    assert (
-        result["period"]
-        .unique()
-        .tolist()
-        == [
-            "2025",
-            "2026",
-        ]
-    )
-
-    year_2026_rows = result[
-        result["period"]
-        == "2026"
+    assert result["period"].unique().tolist() == [
+        "2025",
+        "2026",
     ]
 
-    assert (
-        year_2026_rows["period_total"]
-        .unique()
-        .tolist()
-        == [5]
-    )
+    year_2026_rows = result[result["period"] == "2026"]
+
+    assert year_2026_rows["period_total"].unique().tolist() == [5]
 
 
 def test_generate_long_trend_percentages() -> None:
@@ -206,14 +160,7 @@ def test_generate_long_trend_percentages() -> None:
         period_frequency="M",
     )
 
-    percentage_totals = (
-        result
-        .groupby("period")[
-            "percentage"
-        ]
-        .sum()
-        .round(2)
-    )
+    percentage_totals = result.groupby("period")["percentage"].sum().round(2)
 
     assert percentage_totals.tolist() == [
         100.0,
@@ -242,32 +189,21 @@ def test_generate_wide_trend_table() -> None:
     assert "period" in wide_result.columns
     assert "total" in wide_result.columns
 
-    assert (
-        wide_result["total"]
-        .tolist()
-        == [
-            1,
-            2,
-            2,
-            1,
-        ]
-    )
+    assert wide_result["total"].tolist() == [
+        1,
+        2,
+        2,
+        1,
+    ]
 
-    assert (
-        wide_result["total"].sum()
-        == 6
-    )
+    assert wide_result["total"].sum() == 6
 
 
 def test_empty_source_dataframe_returns_empty_long_table() -> None:
     dataframe = pd.DataFrame(
         {
-            "category": pd.Series(
-                dtype="string"
-            ),
-            "response_due_date": pd.Series(
-                dtype="datetime64[ns]"
-            ),
+            "category": pd.Series(dtype="string"),
+            "response_due_date": pd.Series(dtype="datetime64[ns]"),
         }
     )
 
@@ -316,11 +252,7 @@ def test_all_invalid_dates_return_empty_long_table() -> None:
 
 
 def test_empty_long_table_returns_empty_wide_table() -> None:
-    long_table = (
-        create_empty_long_trend_table(
-            "category"
-        )
-    )
+    long_table = create_empty_long_trend_table("category")
 
     result = generate_wide_trend_table(
         long_table,
@@ -414,6 +346,4 @@ def test_blank_output_column_raises_error() -> None:
         ValueError,
         match="must not be blank",
     ):
-        create_empty_long_trend_table(
-            "   "
-        )
+        create_empty_long_trend_table("   ")

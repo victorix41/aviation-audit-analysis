@@ -28,14 +28,10 @@ def create_empty_long_trend_table(
         Empty DataFrame with the standard long-trend structure.
     """
 
-    cleaned_output_column = (
-        str(category_output_column).strip()
-    )
+    cleaned_output_column = str(category_output_column).strip()
 
     if not cleaned_output_column:
-        raise ValueError(
-            "category_output_column must not be blank."
-        )
+        raise ValueError("category_output_column must not be blank.")
 
     return pd.DataFrame(
         columns=[
@@ -124,65 +120,39 @@ def generate_long_trend_table(
     """
 
     if not isinstance(dataframe, pd.DataFrame):
-        raise TypeError(
-            "dataframe must be a pandas DataFrame."
-        )
+        raise TypeError("dataframe must be a pandas DataFrame.")
 
-    cleaned_category_column = (
-        str(category_column).strip()
-    )
+    cleaned_category_column = str(category_column).strip()
 
-    cleaned_output_column = (
-        str(category_output_column).strip()
-    )
+    cleaned_output_column = str(category_output_column).strip()
 
-    cleaned_date_column = (
-        str(date_column).strip()
-    )
+    cleaned_date_column = str(date_column).strip()
 
-    cleaned_frequency = (
-        str(period_frequency).strip().upper()
-    )
+    cleaned_frequency = str(period_frequency).strip().upper()
 
     if not cleaned_category_column:
-        raise ValueError(
-            "category_column must not be blank."
-        )
+        raise ValueError("category_column must not be blank.")
 
     if not cleaned_output_column:
-        raise ValueError(
-            "category_output_column must not be blank."
-        )
+        raise ValueError("category_output_column must not be blank.")
 
     if not cleaned_date_column:
-        raise ValueError(
-            "date_column must not be blank."
-        )
+        raise ValueError("date_column must not be blank.")
 
     if cleaned_frequency not in VALID_PERIOD_FREQUENCIES:
-        raise ValueError(
-            "period_frequency must be one of: M, Q, Y."
-        )
+        raise ValueError("period_frequency must be one of: M, Q, Y.")
 
     required_columns = {
         cleaned_category_column,
         cleaned_date_column,
     }
 
-    missing_columns = (
-        required_columns
-        - set(dataframe.columns)
-    )
+    missing_columns = required_columns - set(dataframe.columns)
 
     if missing_columns:
-        missing_text = ", ".join(
-            sorted(missing_columns)
-        )
+        missing_text = ", ".join(sorted(missing_columns))
 
-        raise KeyError(
-            "Required trend column(s) missing: "
-            f"{missing_text}"
-        )
+        raise KeyError(f"Required trend column(s) missing: {missing_text}")
 
     working_dataframe = dataframe[
         [
@@ -191,53 +161,34 @@ def generate_long_trend_table(
         ]
     ].copy()
 
-    working_dataframe[
-        cleaned_date_column
-    ] = pd.to_datetime(
-        working_dataframe[
-            cleaned_date_column
-        ],
+    working_dataframe[cleaned_date_column] = pd.to_datetime(
+        working_dataframe[cleaned_date_column],
         errors="coerce",
     )
 
-    working_dataframe = (
-        working_dataframe.dropna(
-            subset=[
-                cleaned_date_column,
-            ]
-        )
+    working_dataframe = working_dataframe.dropna(
+        subset=[
+            cleaned_date_column,
+        ]
     )
 
     if working_dataframe.empty:
-        return create_empty_long_trend_table(
-            cleaned_output_column
-        )
+        return create_empty_long_trend_table(cleaned_output_column)
 
     if standardise_categories:
-        working_dataframe[
-            cleaned_category_column
-        ] = standardise_text_series(
-            working_dataframe[
-                cleaned_category_column
-            ],
-            unspecified_label=(
-                unspecified_label
-            ),
+        working_dataframe[cleaned_category_column] = standardise_text_series(
+            working_dataframe[cleaned_category_column],
+            unspecified_label=(unspecified_label),
         )
 
     working_dataframe["period"] = (
-        working_dataframe[
-            cleaned_date_column
-        ]
-        .dt.to_period(
-            cleaned_frequency
-        )
+        working_dataframe[cleaned_date_column]
+        .dt.to_period(cleaned_frequency)
         .astype(str)
     )
 
     trend_table = (
-        working_dataframe
-        .groupby(
+        working_dataframe.groupby(
             [
                 "period",
                 cleaned_category_column,
@@ -246,20 +197,16 @@ def generate_long_trend_table(
             dropna=False,
         )
         .size()
-        .reset_index(
-            name="frequency"
-        )
+        .reset_index(name="frequency")
         .rename(
             columns={
-                cleaned_category_column:
-                    cleaned_output_column,
+                cleaned_category_column: cleaned_output_column,
             }
         )
     )
 
     trend_table["period_total"] = (
-        trend_table
-        .groupby(
+        trend_table.groupby(
             "period",
             observed=True,
         )["frequency"]
@@ -268,35 +215,23 @@ def generate_long_trend_table(
     )
 
     trend_table["percentage"] = (
-        trend_table["frequency"]
-        / trend_table["period_total"]
-        * 100
+        trend_table["frequency"] / trend_table["period_total"] * 100
     ).round(2)
 
-    trend_table["frequency"] = (
-        trend_table[
-            "frequency"
-        ].astype(int)
-    )
+    trend_table["frequency"] = trend_table["frequency"].astype(int)
 
-    return (
-        trend_table
-        .sort_values(
-            by=[
-                "period",
-                "frequency",
-                cleaned_output_column,
-            ],
-            ascending=[
-                True,
-                False,
-                True,
-            ],
-        )
-        .reset_index(
-            drop=True
-        )
-    )
+    return trend_table.sort_values(
+        by=[
+            "period",
+            "frequency",
+            cleaned_output_column,
+        ],
+        ascending=[
+            True,
+            False,
+            True,
+        ],
+    ).reset_index(drop=True)
 
 
 def generate_wide_trend_table(
@@ -337,18 +272,12 @@ def generate_wide_trend_table(
         long_trend_table,
         pd.DataFrame,
     ):
-        raise TypeError(
-            "long_trend_table must be a pandas DataFrame."
-        )
+        raise TypeError("long_trend_table must be a pandas DataFrame.")
 
-    cleaned_category_column = (
-        str(category_column).strip()
-    )
+    cleaned_category_column = str(category_column).strip()
 
     if not cleaned_category_column:
-        raise ValueError(
-            "category_column must not be blank."
-        )
+        raise ValueError("category_column must not be blank.")
 
     if long_trend_table.empty:
         return create_empty_wide_trend_table()
@@ -359,60 +288,28 @@ def generate_wide_trend_table(
         "frequency",
     }
 
-    missing_columns = (
-        required_columns
-        - set(long_trend_table.columns)
-    )
+    missing_columns = required_columns - set(long_trend_table.columns)
 
     if missing_columns:
-        missing_text = ", ".join(
-            sorted(missing_columns)
-        )
+        missing_text = ", ".join(sorted(missing_columns))
 
-        raise KeyError(
-            "Required wide-trend column(s) missing: "
-            f"{missing_text}"
-        )
+        raise KeyError(f"Required wide-trend column(s) missing: {missing_text}")
 
-    wide_table = (
-        long_trend_table
-        .pivot_table(
-            index="period",
-            columns=cleaned_category_column,
-            values="frequency",
-            aggfunc="sum",
-            fill_value=0,
-        )
-        .reset_index()
-    )
+    wide_table = long_trend_table.pivot_table(
+        index="period",
+        columns=cleaned_category_column,
+        values="frequency",
+        aggfunc="sum",
+        fill_value=0,
+    ).reset_index()
 
     wide_table.columns.name = None
 
-    category_columns = [
-        column
-        for column in wide_table.columns
-        if column != "period"
-    ]
+    category_columns = [column for column in wide_table.columns if column != "period"]
 
     for column in category_columns:
-        wide_table[column] = (
-            wide_table[
-                column
-            ].astype(int)
-        )
+        wide_table[column] = wide_table[column].astype(int)
 
-    wide_table["total"] = (
-        wide_table[
-            category_columns
-        ]
-        .sum(axis=1)
-        .astype(int)
-    )
+    wide_table["total"] = wide_table[category_columns].sum(axis=1).astype(int)
 
-    return (
-        wide_table
-        .sort_values("period")
-        .reset_index(
-            drop=True
-        )
-    )
+    return wide_table.sort_values("period").reset_index(drop=True)

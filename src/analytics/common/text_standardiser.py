@@ -50,37 +50,23 @@ def standardise_text_series(
     """
 
     if not isinstance(series, pd.Series):
-        raise TypeError(
-            "series must be a pandas Series."
-        )
+        raise TypeError("series must be a pandas Series.")
 
-    cleaned_unspecified_label = (
-        str(unspecified_label).strip()
-    )
+    cleaned_unspecified_label = str(unspecified_label).strip()
 
     if not cleaned_unspecified_label:
-        raise ValueError(
-            "unspecified_label must not be blank."
-        )
+        raise ValueError("unspecified_label must not be blank.")
 
-    cleaned_series = (
-        series.astype("string")
-        .str.strip()
-    )
+    cleaned_series = series.astype("string").str.strip()
 
     if collapse_whitespace:
-        cleaned_series = (
-            cleaned_series.str.replace(
-                r"\s+",
-                " ",
-                regex=True,
-            )
+        cleaned_series = cleaned_series.str.replace(
+            r"\s+",
+            " ",
+            regex=True,
         )
 
-    missing_mask = (
-        cleaned_series.isna()
-        | cleaned_series.eq("")
-    )
+    missing_mask = cleaned_series.isna() | cleaned_series.eq("")
 
     cleaned_series = cleaned_series.mask(
         missing_mask,
@@ -88,17 +74,11 @@ def standardise_text_series(
     )
 
     if sentence_case:
-        specified_mask = cleaned_series.ne(
-            cleaned_unspecified_label
-        )
+        specified_mask = cleaned_series.ne(cleaned_unspecified_label)
 
         cleaned_series = cleaned_series.mask(
             specified_mask,
-            cleaned_series[
-                specified_mask
-            ]
-            .str.lower()
-            .str.capitalize(),
+            cleaned_series[specified_mask].str.lower().str.capitalize(),
         )
 
     return cleaned_series.astype("string")

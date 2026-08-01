@@ -16,9 +16,7 @@ def test_standardises_case_and_whitespace() -> None:
         ]
     )
 
-    result = standardise_text_series(
-        series
-    )
+    result = standardise_text_series(series)
 
     assert result.tolist() == [
         "Knowledge gap",
@@ -36,9 +34,7 @@ def test_replaces_missing_and_blank_values() -> None:
         ]
     )
 
-    result = standardise_text_series(
-        series
-    )
+    result = standardise_text_series(series)
 
     assert result.tolist() == [
         "Unspecified",

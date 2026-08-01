@@ -25,12 +25,7 @@ def _prepare_severity_series(
 ) -> pd.Series:
     """Standardise severity values for analysis."""
 
-    severity = (
-        dataframe[SEVERITY_COLUMN]
-        .astype("string")
-        .str.strip()
-        .str.title()
-    )
+    severity = dataframe[SEVERITY_COLUMN].astype("string").str.strip().str.title()
 
     recognised_mask = severity.isin(
         [
@@ -66,9 +61,7 @@ def _generate_trend_table(
         errors="coerce",
     )
 
-    working_dataframe = working_dataframe.dropna(
-        subset=[date_column]
-    )
+    working_dataframe = working_dataframe.dropna(subset=[date_column])
 
     if working_dataframe.empty:
         return pd.DataFrame(
@@ -79,21 +72,14 @@ def _generate_trend_table(
             ]
         )
 
-    working_dataframe["severity_group"] = (
-        _prepare_severity_series(
-            working_dataframe
-        )
-    )
+    working_dataframe["severity_group"] = _prepare_severity_series(working_dataframe)
 
     working_dataframe["period"] = (
-        working_dataframe[date_column]
-        .dt.to_period(period_frequency)
-        .astype(str)
+        working_dataframe[date_column].dt.to_period(period_frequency).astype(str)
     )
 
     trend_table = (
-        working_dataframe
-        .groupby(
+        working_dataframe.groupby(
             [
                 "period",
                 "severity_group",
@@ -115,19 +101,13 @@ def _generate_trend_table(
 
     trend_table.columns.name = None
 
-    trend_table["total"] = (
-        trend_table[
-            SEVERITY_CATEGORIES
-        ].sum(axis=1)
-    )
+    trend_table["total"] = trend_table[SEVERITY_CATEGORIES].sum(axis=1)
 
     for column in [
         *SEVERITY_CATEGORIES,
         "total",
     ]:
-        trend_table[column] = (
-            trend_table[column].astype(int)
-        )
+        trend_table[column] = trend_table[column].astype(int)
 
     return trend_table
 
@@ -141,29 +121,17 @@ def _calculate_latest_change(
     if len(trend_table) < 2:
         return None, None
 
-    previous_value = int(
-        trend_table.iloc[-2][value_column]
-    )
+    previous_value = int(trend_table.iloc[-2][value_column])
 
-    latest_value = int(
-        trend_table.iloc[-1][value_column]
-    )
+    latest_value = int(trend_table.iloc[-1][value_column])
 
-    absolute_change = (
-        latest_value - previous_value
-    )
+    absolute_change = latest_value - previous_value
 
     if previous_value == 0:
-        percentage_change = (
-            0.0
-            if latest_value == 0
-            else None
-        )
+        percentage_change = 0.0 if latest_value == 0 else None
     else:
         percentage_change = round(
-            absolute_change
-            / previous_value
-            * 100,
+            absolute_change / previous_value * 100,
             2,
         )
 
@@ -195,45 +163,21 @@ def generate_severity_analysis(
         "severity analysis",
     )
 
-    total_findings = int(
-        len(dataframe)
-    )
+    total_findings = int(len(dataframe))
 
-    severity_series = (
-        _prepare_severity_series(
-            dataframe
-        )
-    )
+    severity_series = _prepare_severity_series(dataframe)
 
-    observation_count = int(
-        severity_series
-        .eq("Observation")
-        .sum()
-    )
+    observation_count = int(severity_series.eq("Observation").sum())
 
-    minor_count = int(
-        severity_series
-        .eq("Minor")
-        .sum()
-    )
+    minor_count = int(severity_series.eq("Minor").sum())
 
-    major_count = int(
-        severity_series
-        .eq("Major")
-        .sum()
-    )
+    major_count = int(severity_series.eq("Major").sum())
 
-    unspecified_count = int(
-        severity_series
-        .eq("Unspecified")
-        .sum()
-    )
+    unspecified_count = int(severity_series.eq("Unspecified").sum())
 
     pareto_dataframe = dataframe.copy()
 
-    pareto_dataframe[
-        SEVERITY_COLUMN
-    ] = severity_series
+    pareto_dataframe[SEVERITY_COLUMN] = severity_series
 
     pareto_result = generate_pareto(
         pareto_dataframe,
@@ -279,12 +223,10 @@ def generate_severity_analysis(
     return SeverityAnalysis(
         date_column=date_column,
         total_findings=total_findings,
-
         observation_count=observation_count,
         minor_count=minor_count,
         major_count=major_count,
         unspecified_count=unspecified_count,
-
         observation_percentage=(
             calculate_percentage(
                 observation_count,
@@ -309,24 +251,12 @@ def generate_severity_analysis(
                 total_findings,
             )
         ),
-
         pareto=pareto_result,
-
         monthly_trend=monthly_trend,
         quarterly_trend=quarterly_trend,
         yearly_trend=yearly_trend,
-
-        latest_month_total_change=(
-            latest_month_total_change
-        ),
-        latest_month_total_change_percentage=(
-            latest_month_total_change_percentage
-        ),
-
-        latest_month_major_change=(
-            latest_month_major_change
-        ),
-        latest_month_major_change_percentage=(
-            latest_month_major_change_percentage
-        ),
+        latest_month_total_change=(latest_month_total_change),
+        latest_month_total_change_percentage=(latest_month_total_change_percentage),
+        latest_month_major_change=(latest_month_major_change),
+        latest_month_major_change_percentage=(latest_month_major_change_percentage),
     )
