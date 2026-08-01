@@ -58,3 +58,7 @@ urllib3==2.7.0
 uvicorn==0.52.0
 watchdog==6.0.0
 websockets==16.1.1
+
+mypy==2.3.0
+pandas-stubs==3.0.5.260730
+ruff==0.16.1
