@@ -1,0 +1,30 @@
+minimum_pre_commit_version: "4.0.0"
+
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.16.1
+    hooks:
+      - id: ruff-check
+        name: Ruff lint
+        args: [--fix]
+        types_or: [python, pyi]
+
+      - id: ruff-format
+        name: Ruff format
+        types_or: [python, pyi]
+
+  - repo: local
+    hooks:
+      - id: mypy
+        name: mypy type checking
+        entry: python -m mypy src
+        language: system
+        pass_filenames: false
+        always_run: true
+
+      - id: pytest
+        name: pytest regression suite
+        entry: python -m pytest -q
+        language: system
+        pass_filenames: false
+        always_run: true
