@@ -19,7 +19,13 @@ def render_page_header(
 
 
 def render_kpi_cards(
-    metrics: list[tuple[str, int | float | str, str | None]],
+    metrics: list[
+        tuple[
+            str,
+            int | float | str,
+            str | None,
+        ]
+    ],
     *,
     columns_per_row: int = 4,
 ) -> None:
@@ -47,12 +53,14 @@ def render_kpi_cards(
     ):
         row_metrics = metrics[start_index : start_index + columns_per_row]
 
-        columns = st.columns(len(row_metrics))
+        # Always use the same number of columns so incomplete
+        # final rows align with the rows above.
+        columns = st.columns(columns_per_row)
 
         for column, metric in zip(
             columns,
             row_metrics,
-            strict=True,
+            strict=False,
         ):
             label, value, help_text = metric
 

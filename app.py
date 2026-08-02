@@ -5,6 +5,7 @@ import streamlit as st
 from src.ui.components import render_sidebar_status
 from src.ui.pages import PAGE_RENDERERS
 from src.ui.state import initialize_session_state
+from src.version import APP_NAME, APP_VERSION
 
 PAGE_DESCRIPTIONS = {
     "Data Upload": ("Upload and validate an aviation audit register before analysis."),
@@ -37,7 +38,7 @@ def main() -> None:
     """Run the Streamlit application."""
 
     st.set_page_config(
-        page_title="Aviation Audit Analytics",
+        page_title=APP_NAME,
         page_icon="✈️",
         layout="wide",
         initial_sidebar_state="expanded",
@@ -46,7 +47,7 @@ def main() -> None:
     initialize_session_state()
 
     with st.sidebar:
-        st.title("Aviation Audit Analytics")
+        st.title(APP_NAME)
         st.caption("Management decision-support dashboard")
 
         selected_page = st.radio(
@@ -59,7 +60,7 @@ def main() -> None:
         render_sidebar_status()
 
         st.divider()
-        st.caption("Phase 8.3 — Executive dashboard")
+        st.caption(f"Version {APP_VERSION}")
 
     renderer = PAGE_RENDERERS[selected_page]
     renderer(PAGE_DESCRIPTIONS[selected_page])

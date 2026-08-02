@@ -1,6 +1,6 @@
 """Tests for reusable Streamlit UI components."""
 
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, call, patch
 
 import pytest
 
@@ -10,12 +10,16 @@ from src.ui.components import render_kpi_cards
 def test_render_kpi_cards_creates_expected_columns() -> None:
     first_column = MagicMock()
     second_column = MagicMock()
+    third_column = MagicMock()
+    fourth_column = MagicMock()
 
     with patch(
         "src.ui.components.st.columns",
         return_value=[
             first_column,
             second_column,
+            third_column,
+            fourth_column,
         ],
     ) as columns_mock:
         render_kpi_cards(
@@ -34,7 +38,7 @@ def test_render_kpi_cards_creates_expected_columns() -> None:
             columns_per_row=4,
         )
 
-    columns_mock.assert_called_once_with(2)
+    columns_mock.assert_called_once_with(4)
 
     first_column.metric.assert_called_once_with(
         label="Total Findings",
@@ -48,6 +52,9 @@ def test_render_kpi_cards_creates_expected_columns() -> None:
         help=None,
     )
 
+    third_column.metric.assert_not_called()
+    fourth_column.metric.assert_not_called()
+
 
 def test_render_kpi_cards_wraps_to_multiple_rows() -> None:
     first_row_columns = [
@@ -56,6 +63,7 @@ def test_render_kpi_cards_wraps_to_multiple_rows() -> None:
     ]
 
     second_row_columns = [
+        MagicMock(),
         MagicMock(),
     ]
 
@@ -78,7 +86,10 @@ def test_render_kpi_cards_wraps_to_multiple_rows() -> None:
     assert columns_mock.call_count == 2
 
     columns_mock.assert_any_call(2)
-    columns_mock.assert_any_call(1)
+    assert columns_mock.call_args_list == [
+        call(2),
+        call(2),
+    ]
 
 
 def test_render_kpi_cards_rejects_invalid_column_count() -> None:

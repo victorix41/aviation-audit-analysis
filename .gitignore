@@ -1,9 +1,55 @@
+# Python
 __pycache__/
-*.pyc
+*.py[cod]
+*$py.class
+
+# Jupyter
 .ipynb_checkpoints/
-.pytest_cache/
+
+# Virtual environments
 .venv/
+venv/
+env/
+
+# Type checking, testing and linting
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# IDEs and operating systems
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.identifier
+
+# Environment and secrets
 .env
-.streamlit/
-outputs/
+.env.*
+!.env.example
+*.pem
+*.key
+credentials.json
+service-account*.json
+
+# Streamlit
+.streamlit/secrets.toml
+
+# Generated outputs
+outputs/*
+!outputs/.gitkeep
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.swp
+~$*
+
+# Project inspection files
+phase_*_project_files.txt
+
+# Project data
 data/*.xlsx

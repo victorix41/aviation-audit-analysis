@@ -12,6 +12,10 @@ DEFAULT_SESSION_STATE: dict[str, Any] = {
     "validation_results": None,
     "processing_error": None,
     "active_filters": {},
+    "word_report_bytes": None,
+    "excel_report_bytes": None,
+    "report_as_of_date": None,
+    "report_source_file_name": None,
 }
 
 
@@ -32,6 +36,10 @@ def clear_data_state() -> None:
         "cleaned_dataframe",
         "validation_results",
         "processing_error",
+        "word_report_bytes",
+        "excel_report_bytes",
+        "report_as_of_date",
+        "report_source_file_name",
     ):
         st.session_state[key] = DEFAULT_SESSION_STATE[key]
 
