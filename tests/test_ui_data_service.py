@@ -1,11 +1,13 @@
 """Tests for the Streamlit data service layer."""
 
+from datetime import date
 from io import BytesIO
 
 import pandas as pd
 import pytest
 
 from src.ui.data_service import (
+    generate_executive_overview,
     load_uploaded_audit_data,
     process_uploaded_audit_file,
 )
@@ -127,3 +129,52 @@ def test_empty_csv_raises_error() -> None:
             uploaded_file,
             file_name="audit.csv",
         )
+
+
+def test_generate_executive_overview() -> None:
+    uploaded_file = create_csv_upload()
+
+    processed_result = process_uploaded_audit_file(
+        uploaded_file,
+        file_name="audit.csv",
+    )
+
+    overview = generate_executive_overview(
+        processed_result.cleaned_dataframe,
+        as_of_date=date(2026, 2, 1),
+    )
+
+    assert overview.audit_summary.total_findings == 2
+    assert overview.audit_summary.major_count == 1
+    assert overview.audit_summary.minor_count == 1
+    assert overview.audit_summary.observation_count == 0
+
+    assert overview.severity_analysis.total_findings == 2
+    assert overview.human_factor_analysis.total_findings == 2
+    assert overview.root_cause_analysis.total_findings == 2
+
+    assert overview.executive_insights.has_observations is True
+
+
+def test_executive_overview_uses_selected_as_of_date() -> None:
+    uploaded_file = create_csv_upload()
+
+    processed_result = process_uploaded_audit_file(
+        uploaded_file,
+        file_name="audit.csv",
+    )
+
+    overview = generate_executive_overview(
+        processed_result.cleaned_dataframe,
+        as_of_date=date(2026, 3, 1),
+    )
+
+    assert overview.audit_summary.as_of_date == date(
+        2026,
+        3,
+        1,
+    )
+
+    assert overview.audit_summary.past_due_response_count == 1
+
+    assert overview.audit_summary.due_within_30_days_count == 1

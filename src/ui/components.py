@@ -18,6 +18,51 @@ def render_page_header(
     st.divider()
 
 
+def render_kpi_cards(
+    metrics: list[tuple[str, int | float | str, str | None]],
+    *,
+    columns_per_row: int = 4,
+) -> None:
+    """
+    Render reusable KPI cards using Streamlit metrics.
+
+    Args:
+        metrics:
+            List of tuples containing:
+            - label;
+            - value;
+            - optional help text.
+
+        columns_per_row:
+            Maximum number of KPI cards displayed in one row.
+    """
+
+    if columns_per_row < 1:
+        raise ValueError("columns_per_row must be at least 1.")
+
+    for start_index in range(
+        0,
+        len(metrics),
+        columns_per_row,
+    ):
+        row_metrics = metrics[start_index : start_index + columns_per_row]
+
+        columns = st.columns(len(row_metrics))
+
+        for column, metric in zip(
+            columns,
+            row_metrics,
+            strict=True,
+        ):
+            label, value, help_text = metric
+
+            column.metric(
+                label=label,
+                value=value,
+                help=help_text,
+            )
+
+
 def render_planned_sections(
     sections: Sequence[str],
 ) -> None:

@@ -59,7 +59,7 @@ def main() -> None:
         render_sidebar_status()
 
         st.divider()
-        st.caption("Phase 8.1 — Application foundation")
+        st.caption("Phase 8.3 — Executive dashboard")
 
     renderer = PAGE_RENDERERS[selected_page]
     renderer(PAGE_DESCRIPTIONS[selected_page])
